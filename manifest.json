@@ -9,12 +9,12 @@
     "imageUrl": "https://raw.githubusercontent.com/pacoonrox/jellyfin-plugin-opensubtitles/master/.github/images/jellyfin-plugin-opensubtitles.png",
     "versions": [
       {
-        "version": "26.0.0.0",
-        "changelog": "- Add bulk season subtitle downloader: pick a series and one or more seasons on the plugin settings page and download the best-matching English subtitle (perfect hash match preferred, highest download count as tiebreaker) for every episode in one click.",
+        "version": "26.0.0.1",
+        "changelog": "- Pin build to Jellyfin.Common/Jellyfin.Controller 12.0.0 exactly (fixes PluginStatus.NotSupported on 12.0.0-based servers).\n- Add bulk season subtitle downloader: pick a series and one or more seasons on the plugin settings page and download the best-matching English subtitle (perfect hash match preferred, highest download count as tiebreaker) for every episode in one click.",
         "targetAbi": "12.0.0.0",
-        "sourceUrl": "https://github.com/pacoonrox/jellyfin-plugin-opensubtitles/releases/download/v26.0.0.0/jellyfin-plugin-opensubtitles_26.0.0.0.zip",
-        "checksum": "983551f088f9f83cd7736e57d0276fe8",
-        "timestamp": "2026-09-21T00:21:43Z"
+        "sourceUrl": "https://github.com/pacoonrox/jellyfin-plugin-opensubtitles/releases/download/v26.0.0.1/jellyfin-plugin-opensubtitles_26.0.0.1.zip",
+        "checksum": "eed5c6c9bf2244510bfa83048c428c12",
+        "timestamp": "2026-09-21T00:36:35Z"
       }
     ]
   }
