@@ -29,6 +29,32 @@
                     </button>
                 </div>
             </form>
+
+            <form id="OpenSubtitlesBulkSeasonForm" style="margin-top: 2em;">
+                <h3 class="sectionTitle sectionTitle-cards"><b>Bulk download season subtitles</b></h3>
+                <div class="fieldDescription">
+                    Pick a series and season(s) below to automatically download the best-matching English subtitle for every episode. A hash-based "perfect match" is preferred; when there is more than one perfect match, the one with the most downloads is used.
+                </div>
+                <div class="inputContainer">
+                    <select is="emby-select" id="bulkSeriesSelect" label="Series">
+                        <option value="">Loading series...</option>
+                    </select>
+                </div>
+                <div id="bulkSeasonsSection" style="display: none;">
+                    <div class="fieldDescription">
+                        <a is="emby-linkbutton" class="button-link" id="bulkSelectAll" href="#">Select all</a>
+                        &nbsp;|&nbsp;
+                        <a is="emby-linkbutton" class="button-link" id="bulkSelectNone" href="#">Select none</a>
+                    </div>
+                    <div id="bulkSeasonsList"></div>
+                    <div>
+                        <button id="bulkDownloadButton" is="emby-button" type="submit" class="raised button-submit block">
+                            <span>Download subtitles for selected seasons</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="bulkResults" class="fieldDescription"></div>
+            </form>
         </div>
     </div>
 </div>

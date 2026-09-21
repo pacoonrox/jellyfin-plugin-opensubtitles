@@ -2,6 +2,27 @@ const OpenSubtitlesConfig = {
     pluginUniqueId: '4b9ed42f-5185-48b5-9803-6ff2989014c4'
 };
 
+const EpisodeStatusLabels = {
+    Downloaded: 'Downloaded',
+    AlreadyHasSubtitle: 'Already had an English subtitle',
+    NoMatchFound: 'No match found',
+    MissingEpisode: 'Missing episode file, skipped',
+    RateLimited: 'Skipped - daily download limit reached',
+    Error: 'Error'
+};
+
+function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+}
+
+function getJson(url) {
+    return ApiClient.ajax({ type: 'GET', url }).then(function (response) {
+        return response.json();
+    });
+}
+
 export default function (view, params) {
     let credentialsWarning;
 
@@ -20,6 +41,18 @@ export default function (view, params) {
         }).catch(function () {
             Dashboard.hideLoadingMsg();
             Dashboard.processErrorResponse({ statusText: "Failed to load plugin configuration" });
+        });
+
+        const seriesSelect = page.querySelector('#bulkSeriesSelect');
+        seriesSelect.innerHTML = '<option value="">Loading series...</option>';
+        getJson(ApiClient.getUrl('Jellyfin.Plugin.OpenSubtitles/Series')).then(function (series) {
+            seriesSelect.innerHTML = '<option value="">Select a series...</option>' +
+                series.map(function (s) {
+                    const year = s.ProductionYear ? ` (${s.ProductionYear})` : '';
+                    return `<option value="${escapeHtml(s.Id)}">${escapeHtml(s.Name + year)}</option>`;
+                }).join('');
+        }).catch(function () {
+            seriesSelect.innerHTML = '<option value="">Failed to load series</option>';
         });
     });
 
@@ -84,4 +117,129 @@ export default function (view, params) {
         });
         return false;
     });
+
+    view.querySelector('#bulkSeriesSelect').addEventListener('change', function () {
+        const page = view;
+        const seriesId = this.value;
+        const section = page.querySelector('#bulkSeasonsSection');
+        const list = page.querySelector('#bulkSeasonsList');
+
+        page.querySelector('#bulkResults').innerHTML = '';
+        list.innerHTML = '';
+        section.style.display = 'none';
+
+        if (!seriesId) {
+            return;
+        }
+
+        list.innerHTML = '<p>Loading seasons...</p>';
+        section.style.display = 'block';
+
+        getJson(ApiClient.getUrl(`Jellyfin.Plugin.OpenSubtitles/Series/${seriesId}/Seasons`)).then(function (seasons) {
+            if (seasons.length === 0) {
+                list.innerHTML = '<p>This series has no seasons.</p>';
+                return;
+            }
+
+            list.innerHTML = seasons.map(function (s) {
+                const episodeLabel = s.EpisodeCount === 1 ? '1 episode' : `${s.EpisodeCount} episodes`;
+                return '<label class="checkboxContainer">' +
+                    `<input is="emby-checkbox" type="checkbox" class="bulkSeasonCheckbox" data-seasonid="${escapeHtml(s.Id)}" checked />` +
+                    `<span>${escapeHtml(s.Name)} (${episodeLabel})</span>` +
+                    '</label>';
+            }).join('');
+        }).catch(function () {
+            list.innerHTML = '<p>Failed to load seasons.</p>';
+        });
+    });
+
+    view.querySelector('#bulkSelectAll').addEventListener('click', function (e) {
+        e.preventDefault();
+        view.querySelectorAll('.bulkSeasonCheckbox').forEach(function (cb) {
+            cb.checked = true;
+        });
+    });
+
+    view.querySelector('#bulkSelectNone').addEventListener('click', function (e) {
+        e.preventDefault();
+        view.querySelectorAll('.bulkSeasonCheckbox').forEach(function (cb) {
+            cb.checked = false;
+        });
+    });
+
+    view.querySelector('#OpenSubtitlesBulkSeasonForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const page = view;
+        const resultsEl = page.querySelector('#bulkResults');
+        const seasonIds = Array.from(page.querySelectorAll('.bulkSeasonCheckbox:checked')).map(function (cb) {
+            return cb.getAttribute('data-seasonid');
+        });
+
+        if (seasonIds.length === 0) {
+            resultsEl.innerText = 'Select at least one season first.';
+            return false;
+        }
+
+        const downloadButton = page.querySelector('#bulkDownloadButton');
+        downloadButton.disabled = true;
+        resultsEl.innerText = 'Downloading subtitles, this may take a while...';
+        Dashboard.showLoadingMsg();
+
+        const url = ApiClient.getUrl('Jellyfin.Plugin.OpenSubtitles/Seasons/DownloadSubtitles');
+        const data = JSON.stringify({ SeasonIds: seasonIds });
+
+        ApiClient.ajax({ type: 'POST', url, data, contentType: 'application/json' }).then(function (response) {
+            return response.json().then(function (body) {
+                return { ok: response.ok, body: body };
+            });
+        }).then(function (result) {
+            downloadButton.disabled = false;
+            Dashboard.hideLoadingMsg();
+
+            if (!result.ok) {
+                resultsEl.innerText = `Request failed - ${result.body && result.body.Message ? result.body.Message : JSON.stringify(result.body)}`;
+                return;
+            }
+
+            renderBulkResults(resultsEl, result.body);
+        }).catch(function () {
+            downloadButton.disabled = false;
+            Dashboard.hideLoadingMsg();
+            resultsEl.innerText = 'Request failed. Please check your network or server.';
+        });
+
+        return false;
+    });
+}
+
+function renderBulkResults(container, seasonResults) {
+    let downloaded = 0;
+    let total = 0;
+
+    const seasonsHtml = seasonResults.map(function (season) {
+        const episodesHtml = season.Episodes.map(function (ep) {
+            total++;
+            if (ep.Status === 'Downloaded') {
+                downloaded++;
+            }
+
+            let detail = EpisodeStatusLabels[ep.Status] || ep.Status;
+            if (ep.Status === 'Downloaded' && ep.SubtitleRelease) {
+                const downloads = ep.DownloadCount != null ? `, ${ep.DownloadCount} downloads` : '';
+                const perfect = ep.IsPerfectMatch ? ', perfect match' : '';
+                detail += ` - ${escapeHtml(ep.SubtitleRelease)}${downloads}${perfect}`;
+            } else if (ep.Status === 'Error' && ep.Error) {
+                detail += `: ${escapeHtml(ep.Error)}`;
+            }
+
+            const epNumber = ep.IndexNumber != null ? `Episode ${ep.IndexNumber}` : 'Episode';
+            const epName = ep.EpisodeName ? ` - ${escapeHtml(ep.EpisodeName)}` : '';
+            return `<div>${escapeHtml(epNumber)}${epName}: ${detail}</div>`;
+        }).join('');
+
+        return `<h4>${escapeHtml(season.SeriesName)} - ${escapeHtml(season.SeasonName)}</h4>${episodesHtml}`;
+    }).join('');
+
+    container.innerHTML = `<p><b>${downloaded} of ${total} episode(s) downloaded</b></p>${seasonsHtml}`;
 }

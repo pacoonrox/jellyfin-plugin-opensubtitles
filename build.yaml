@@ -1,16 +1,19 @@
 name: "Open Subtitles"
 guid: "4b9ed42f-5185-48b5-9803-6ff2989014c4"
 imageUrl: "https://repo.jellyfin.org/releases/plugin/images/jellyfin-plugin-opensubtitles.png"
-version: 25
+version: 26
 targetAbi: "12.0.0.0"
 framework: "net10.0"
-owner: "jellyfin"
+owner: "pacoonrox"
 overview: "Download subtitles for your media"
 description: "Download subtitles from the internet to use with your media files. (Requires configuration)"
 category: "Subtitles"
 artifacts:
   - "Jellyfin.Plugin.OpenSubtitles.dll"
 changelog: |-
+  - Add bulk season subtitle downloader: pick a series and one or more seasons on the plugin settings page and download the best-matching English subtitle (perfect hash match preferred, highest download count as tiebreaker) for every episode in one click.
+
+  ### Previous release ###
   - Unstable: Update to latest Jellyfin preview packages (#207) @crobibero, @jellyfin-bot
   - Add handling for small video files (#192) @MBR-0001
 

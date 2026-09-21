@@ -20,6 +20,8 @@
 
 This is a plugin allows you to download subtitles from [Open Subtitles](https://opensubtitles.com) for your media.
 
+This fork adds a **bulk season subtitle downloader**. On the plugin's settings page, pick a series, choose one or more seasons (all are selected by default), and click "Download subtitles for selected seasons" to automatically fetch the best-matching English subtitle for every episode in those seasons. A hash-based "perfect match" is preferred; if more than one perfect match is available, the one with the most downloads is used. Episodes that already have an English subtitle are skipped.
+
 ## Installation
 
 [See the official documentation for install instructions](https://jellyfin.org/docs/general/server/plugins/index.html#installing).
