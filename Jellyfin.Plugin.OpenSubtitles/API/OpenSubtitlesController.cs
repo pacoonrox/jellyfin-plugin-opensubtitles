@@ -271,7 +271,16 @@ public class OpenSubtitlesController : ControllerBase
 
                     if (best is null)
                     {
-                        episodeResult.Status = EpisodeSubtitleStatus.NoMatchFound;
+                        if (downloader.IsRateLimited)
+                        {
+                            rateLimited = true;
+                            episodeResult.Status = EpisodeSubtitleStatus.RateLimited;
+                        }
+                        else
+                        {
+                            episodeResult.Status = EpisodeSubtitleStatus.NoMatchFound;
+                        }
+
                         episodeResults.Add(episodeResult);
                         continue;
                     }

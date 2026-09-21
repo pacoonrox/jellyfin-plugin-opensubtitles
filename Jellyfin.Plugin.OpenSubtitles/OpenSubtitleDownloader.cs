@@ -52,6 +52,12 @@ public class OpenSubtitleDownloader : ISubtitleProvider
     /// </summary>
     public static OpenSubtitleDownloader? Instance { get; private set; }
 
+    /// <summary>
+    /// Gets a value indicating whether the daily OpenSubtitles download limit has been reached for the
+    /// currently logged in account. An automated <see cref="Search"/> call returns no results once this is true.
+    /// </summary>
+    public bool IsRateLimited => _login?.User?.RemainingDownloads <= 0;
+
     /// <inheritdoc />
     public string Name => "Open Subtitles";
 

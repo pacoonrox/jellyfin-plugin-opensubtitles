@@ -1,7 +1,7 @@
 name: "Open Subtitles"
 guid: "4b9ed42f-5185-48b5-9803-6ff2989014c4"
 imageUrl: "https://repo.jellyfin.org/releases/plugin/images/jellyfin-plugin-opensubtitles.png"
-version: 26.0.0.1
+version: 26.0.0.2
 targetAbi: "12.0.0.0"
 framework: "net10.0"
 owner: "pacoonrox"
@@ -11,6 +11,9 @@ category: "Subtitles"
 artifacts:
   - "Jellyfin.Plugin.OpenSubtitles.dll"
 changelog: |-
+  - Correctly report "rate limited" instead of "no match found" for episodes skipped in the bulk season downloader once the daily OpenSubtitles download limit is reached.
+
+  ### 26.0.0.1 ###
   - Pin build to Jellyfin.Common/Jellyfin.Controller 12.0.0 exactly (was a floating 12.*-* range that could resolve to a newer, incompatible 12.1.0 and get flagged NotSupported on 12.0.0-based servers).
 
   ### 26.0.0.0 ###
