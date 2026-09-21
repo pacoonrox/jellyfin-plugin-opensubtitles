@@ -6,7 +6,7 @@
     "overview": "Download subtitles for your media",
     "owner": "pacoonrox",
     "category": "Subtitles",
-    "imageUrl": "https://repo.jellyfin.org/releases/plugin/images/jellyfin-plugin-opensubtitles.png",
+    "imageUrl": "https://raw.githubusercontent.com/pacoonrox/jellyfin-plugin-opensubtitles/master/.github/images/jellyfin-plugin-opensubtitles.png",
     "versions": [
       {
         "version": "26.0.0.0",
