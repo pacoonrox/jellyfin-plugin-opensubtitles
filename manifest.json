@@ -1,0 +1,21 @@
+[
+  {
+    "guid": "4b9ed42f-5185-48b5-9803-6ff2989014c4",
+    "name": "Open Subtitles",
+    "description": "Download subtitles from the internet to use with your media files. (Requires configuration) This fork adds a bulk season subtitle downloader.",
+    "overview": "Download subtitles for your media",
+    "owner": "pacoonrox",
+    "category": "Subtitles",
+    "imageUrl": "https://repo.jellyfin.org/releases/plugin/images/jellyfin-plugin-opensubtitles.png",
+    "versions": [
+      {
+        "version": "26.0.0.0",
+        "changelog": "- Add bulk season subtitle downloader: pick a series and one or more seasons on the plugin settings page and download the best-matching English subtitle (perfect hash match preferred, highest download count as tiebreaker) for every episode in one click.",
+        "targetAbi": "12.0.0.0",
+        "sourceUrl": "https://github.com/pacoonrox/jellyfin-plugin-opensubtitles/releases/download/v26.0.0.0/jellyfin-plugin-opensubtitles_26.0.0.0.zip",
+        "checksum": "983551f088f9f83cd7736e57d0276fe8",
+        "timestamp": "2026-09-21T00:21:43Z"
+      }
+    ]
+  }
+]
